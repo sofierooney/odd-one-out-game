@@ -18,7 +18,20 @@
         <span class="topbar-note">A pass-the-phone party game</span>
       </header>
 
-      <section id="setup-screen" class="screen setup-screen" aria-labelledby="setup-title">
+      <section id="cover-screen" class="screen cover-screen" aria-labelledby="cover-title">
+        <div class="cover-content">
+          <p class="eyebrow"><span class="status-dot"></span> A GAME OF BLUFFS &amp; SIDE-EYES</p>
+          <div class="cover-mark" aria-hidden="true">✳</div>
+          <h1 id="cover-title">Who is the<br><span>Odd One Out?</span></h1>
+          <p class="cover-copy">One secret word. A few suspicious friends. Can you spot who’s faking it?</p>
+          <button id="enter-game" class="button button-primary cover-button" type="button">
+            Enter the circle <span aria-hidden="true">↗</span>
+          </button>
+          <p class="cover-caption">PASS THE PHONE. TRUST NO ONE.</p>
+        </div>
+      </section>
+
+      <section id="setup-screen" class="screen setup-screen" aria-labelledby="setup-title" hidden>
         <div class="intro">
           <p class="eyebrow"><span class="status-dot"></span> A LITTLE MYSTERY FOR EVERYONE</p>
           <h1 id="setup-title">Some of you<br><span>don’t know.</span></h1>
@@ -44,11 +57,11 @@
               <select id="category-select">
                 <option value="all">Surprise me</option>
                 <option value="food">Food &amp; drink</option>
-                <option value="animals">Animals</option>
                 <option value="locations">Locations</option>
                 <option value="things">Everyday things</option>
                 <option value="activities">Things to do</option>
                 <option value="people">People</option>
+                <option value="freak-time">Freak Time</option>
               </select>
               <span class="select-arrow" aria-hidden="true">⌄</span>
             </div>
@@ -61,8 +74,15 @@
             <p id="people-list-error" class="error-message" role="alert" hidden></p>
           </div>
 
+          <div id="freak-time-list-field" class="category-field people-list-field" hidden>
+            <label for="freak-time-list-input" class="eyebrow">YOUR FREAK TIME LIST</label>
+            <textarea id="freak-time-list-input" class="people-list-input" rows="5" placeholder="Add your Freak Time prompts, one per line..." aria-describedby="freak-time-list-note"></textarea>
+            <p id="freak-time-list-note" class="field-note">Saved only in this browser. Add prompts whenever you think of them.</p>
+            <p id="freak-time-list-error" class="error-message" role="alert" hidden></p>
+          </div>
+
           <div class="category-field">
-            <label for="impostor-count" class="eyebrow">04 / HOW MANY IMPOSTORS?</label>
+            <label for="impostor-count" class="eyebrow">03 / HOW MANY IMPOSTORS?</label>
             <div class="select-wrap">
               <select id="impostor-count">
                 <option value="1">1 impostor</option>

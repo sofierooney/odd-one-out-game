@@ -1,6 +1,5 @@
 const WORDS = {
   food: ["Pancakes", "Sushi", "Popcorn", "Watermelon", "Tacos", "Ice cream", "Avocado", "Pizza", "Dumplings", "Lemonade", "Brownie", "Cereal"],
-  animals: ["Penguin", "Octopus", "Giraffe", "Dolphin", "Hedgehog", "Flamingo", "Turtle", "Koala", "Peacock", "Raccoon", "Jellyfish", "Llama"],
   locations: ["Aquarium", "Airport", "Camping", "Museum", "Lighthouse", "Rooftop", "Library", "Waterfall", "Movie theater", "Amusement park", "Bakery", "Beach", "Balboa Park", "San Diego Zoo", "La Jolla Cove", "Coronado Island", "Gaslamp Quarter", "Old Town San Diego", "Petco Park", "Sunset Cliffs", "USS Midway Museum", "Seaport Village", "Torrey Pines", "Mission Beach", "Cabrillo National Monument", "Liberty Public Market", "Stacks", "Cabana", "Barn", "Prison", "New York City", "London", "Paris", "Tokyo", "Rome", "Sydney", "Dubai", "Singapore", "Hong Kong", "Mexico City", "Rio de Janeiro", "Cairo", "Istanbul", "Seoul", "Bangkok", "Amsterdam", "Barcelona", "Los Angeles", "New Delhi", "Cape Town"],
   things: ["Umbrella", "Sunglasses", "Backpack", "Candle", "Alarm clock", "Roller skates", "Toothbrush", "Headphones", "Snow globe", "Flashlight", "Suitcase", "Slippers"],
   activities: ["Karaoke", "Gardening", "Skateboarding", "Baking", "Photography", "Kite flying", "Dancing", "Fishing", "Yoga", "Bowling", "Skiing", "Paddleboarding"]
@@ -8,17 +7,18 @@ const WORDS = {
 
 const CATEGORY_LABELS = {
   food: "Food & drink",
-  animals: "Animals",
   locations: "Locations",
   things: "Everyday things",
   activities: "Things to do",
-  people: "People"
+  people: "People",
+  "freak-time": "Freak Time"
 };
 
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 20;
 
 const screens = {
+  cover: document.querySelector("#cover-screen"),
   setup: document.querySelector("#setup-screen"),
   deal: document.querySelector("#deal-screen"),
   discussion: document.querySelector("#discussion-screen"),
@@ -34,6 +34,9 @@ const impostorCountSelect = document.querySelector("#impostor-count");
 const peopleListField = document.querySelector("#people-list-field");
 const peopleListInput = document.querySelector("#people-list-input");
 const peopleListError = document.querySelector("#people-list-error");
+const freakTimeListField = document.querySelector("#freak-time-list-field");
+const freakTimeListInput = document.querySelector("#freak-time-list-input");
+const freakTimeListError = document.querySelector("#freak-time-list-error");
 const playerCards = document.querySelector("#player-cards");
 const dealProgress = document.querySelector("#deal-progress");
 const startDiscussionButton = document.querySelector("#start-discussion");
@@ -57,6 +60,10 @@ function getPeopleNames() {
   return peopleListInput.value.split(/\r?\n/).map((name) => name.trim()).filter(Boolean);
 }
 
+function getFreakTimePrompts() {
+  return freakTimeListInput.value.split(/\r?\n/).map((prompt) => prompt.trim()).filter(Boolean);
+}
+
 function setPeopleListError(message) {
   peopleListError.textContent = message;
   peopleListError.hidden = !message;
@@ -64,6 +71,7 @@ function setPeopleListError(message) {
 
 function syncPeopleCategory() {
   peopleListField.hidden = categorySelect.value !== "people";
+  freakTimeListField.hidden = categorySelect.value !== "freak-time";
 }
 
 function renderPlayers() {
@@ -134,10 +142,18 @@ function getPlayerNames() {
 function chooseWord() {
   const selectedCategory = categorySelect.value;
   const categoryKeys = selectedCategory === "all"
-    ? [...Object.keys(WORDS), ...(getPeopleNames().length ? ["people"] : [])]
+    ? [
+      ...Object.keys(WORDS),
+      ...(getPeopleNames().length ? ["people"] : []),
+      ...(getFreakTimePrompts().length ? ["freak-time"] : [])
+    ]
     : [selectedCategory];
   const category = categoryKeys[Math.floor(Math.random() * categoryKeys.length)];
-  const wordList = category === "people" ? getPeopleNames() : WORDS[category];
+  const wordList = category === "people"
+    ? getPeopleNames()
+    : category === "freak-time"
+      ? getFreakTimePrompts()
+      : WORDS[category];
   const word = wordList[Math.floor(Math.random() * wordList.length)];
   return { category, word };
 }
@@ -152,6 +168,14 @@ function startRound() {
     return;
   }
   setPeopleListError("");
+  if (categorySelect.value === "freak-time" && getFreakTimePrompts().length === 0) {
+    freakTimeListError.textContent = "Add at least one prompt to play the Freak Time category.";
+    freakTimeListError.hidden = false;
+    freakTimeListInput.focus();
+    return;
+  }
+  freakTimeListError.hidden = true;
+  freakTimeListError.textContent = "";
   if (playerNames.length < requiredPlayers) {
     setupError.textContent = `You need at least ${requiredPlayers} players for ${impostorCount} ${impostorCount === 1 ? "impostor" : "impostors"}.`;
     setupError.hidden = false;
@@ -246,6 +270,7 @@ playerCardDialog.addEventListener("close", () => {
 
 document.querySelector("#hide-player-card").addEventListener("click", hidePlayerCard);
 startDiscussionButton.addEventListener("click", startDiscussion);
+document.querySelector("#enter-game").addEventListener("click", () => showScreen("setup"));
 
 function revealImpostor() {
   const impostorNames = players.filter((_, index) => impostorIndices.has(index));
@@ -286,7 +311,12 @@ document.querySelector("#new-game").addEventListener("click", () => {
   playerList.querySelector("input")?.focus();
 });
 
-categorySelect.addEventListener("change", clearSetupError);
+categorySelect.addEventListener("change", () => {
+  clearSetupError();
+  setPeopleListError("");
+  freakTimeListError.hidden = true;
+  freakTimeListError.textContent = "";
+});
 impostorCountSelect.addEventListener("change", clearSetupError);
 categorySelect.addEventListener("change", syncPeopleCategory);
 peopleListInput.addEventListener("input", () => {
@@ -300,11 +330,32 @@ peopleListInput.addEventListener("input", () => {
   clearSetupError();
 });
 
+freakTimeListInput.addEventListener("input", () => {
+  try {
+    localStorage.setItem("odd-one-out-freak-time", freakTimeListInput.value);
+    freakTimeListError.hidden = true;
+    freakTimeListError.textContent = "";
+  } catch (error) {
+    freakTimeListError.textContent = "Could not save this list in your browser. The prompts will be available only until you close this page.";
+    freakTimeListError.hidden = false;
+    console.error("Could not save the Freak Time list to local storage.", error);
+  }
+  clearSetupError();
+});
+
 try {
   peopleListInput.value = localStorage.getItem("odd-one-out-people") || "";
 } catch (error) {
   setPeopleListError("Could not load a saved People list from this browser.");
   console.error("Could not load the People list from local storage.", error);
+}
+
+try {
+  freakTimeListInput.value = localStorage.getItem("odd-one-out-freak-time") || "";
+} catch (error) {
+  freakTimeListError.textContent = "Could not load a saved Freak Time list from this browser.";
+  freakTimeListError.hidden = false;
+  console.error("Could not load the Freak Time list from local storage.", error);
 }
 
 renderPlayers();
