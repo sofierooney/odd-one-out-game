@@ -34,21 +34,22 @@ const impostorCountSelect = document.querySelector("#impostor-count");
 const peopleListField = document.querySelector("#people-list-field");
 const peopleListInput = document.querySelector("#people-list-input");
 const peopleListError = document.querySelector("#people-list-error");
-const currentPlayerName = document.querySelector("#current-player-name");
-const cardCategory = document.querySelector("#card-category");
-const cardContent = document.querySelector("#card-content");
-const cardHint = document.querySelector("#card-hint");
-const secretCard = document.querySelector("#secret-card");
-const revealCardButton = document.querySelector("#reveal-card");
-const passPhoneButton = document.querySelector("#pass-phone");
-const dealPosition = document.querySelector("#deal-position");
+const playerCards = document.querySelector("#player-cards");
+const dealProgress = document.querySelector("#deal-progress");
+const startDiscussionButton = document.querySelector("#start-discussion");
+const discussionButtonLabel = document.querySelector("#discussion-button-label");
+const playerCardDialog = document.querySelector("#player-card-dialog");
+const dialogPlayerName = document.querySelector("#dialog-player-name");
+const dialogCardCategory = document.querySelector("#dialog-card-category");
+const dialogCardContent = document.querySelector("#dialog-card-content");
+const dialogCardHint = document.querySelector("#dialog-card-hint");
 
 let players = ["sof", "mont", "meegs", "marj", "ava", "saff", "viv", "summz", "lior"];
-let currentPlayerIndex = 0;
 let impostorIndices = new Set();
+let seenPlayerIndices = new Set();
+let activeCardIndex = -1;
 let secretWord = "";
 let secretCategory = "";
-let cardIsRevealed = false;
 let roundNumber = 1;
 
 function getPeopleNames() {
@@ -157,7 +158,6 @@ function startRound() {
   }
 
   players = playerNames;
-  currentPlayerIndex = 0;
   const shuffledIndices = players.map((_, index) => index);
   for (let index = 0; index < impostorCount; index += 1) {
     const swapIndex = index + Math.floor(Math.random() * (shuffledIndices.length - index));
@@ -165,56 +165,86 @@ function startRound() {
   }
   impostorIndices = new Set(shuffledIndices.slice(0, impostorCount));
   ({ category: secretCategory, word: secretWord } = chooseWord());
+  seenPlayerIndices = new Set();
+  activeCardIndex = -1;
   document.querySelector("#round-label").textContent = `ROUND ${String(roundNumber).padStart(2, "0")}`;
-  setupDealCard();
+  renderPlayerCards();
   showScreen("deal");
 }
 
-function setupDealCard() {
-  const isImpostor = impostorIndices.has(currentPlayerIndex);
-  currentPlayerName.textContent = players[currentPlayerIndex];
-  dealPosition.textContent = `PLAYER ${currentPlayerIndex + 1} OF ${players.length}`;
-  cardCategory.textContent = CATEGORY_LABELS[secretCategory];
-  cardContent.textContent = "Tap to reveal";
-  cardHint.textContent = "Only you should look";
-  secretCard.setAttribute("aria-label", `Tap to reveal ${players[currentPlayerIndex]}'s card`);
-  secretCard.classList.remove("is-revealed", "is-impostor");
-  cardIsRevealed = false;
-  revealCardButton.hidden = false;
-  passPhoneButton.hidden = true;
+function renderPlayerCards() {
+  playerCards.replaceChildren();
 
-  const revealCard = () => {
-    if (cardIsRevealed) return;
-    cardIsRevealed = true;
-    secretCard.classList.add("is-revealed");
-    if (isImpostor) {
-      secretCard.classList.add("is-impostor");
-      cardContent.textContent = "You’re the impostor";
-      cardHint.textContent = "Blend in. Don’t get caught.";
-    } else {
-      cardContent.textContent = secretWord;
-      cardHint.textContent = "Keep it secret. Blend in.";
-    }
-    secretCard.setAttribute("aria-label", `Card revealed for ${players[currentPlayerIndex]}`);
-    revealCardButton.hidden = true;
-    passPhoneButton.hidden = false;
-  };
+  players.forEach((name, index) => {
+    const seen = seenPlayerIndices.has(index);
+    const card = document.createElement("button");
+    card.className = "player-card";
+    card.type = "button";
+    card.disabled = seen;
+    card.setAttribute("aria-label", `${name}, ${seen ? "card seen" : "card not seen"}`);
 
-  secretCard.onclick = revealCard;
-  revealCardButton.onclick = revealCard;
+    const cardName = document.createElement("span");
+    cardName.className = "player-card-name";
+    cardName.textContent = name;
+
+    const cardStatus = document.createElement("span");
+    cardStatus.className = "player-card-status";
+    cardStatus.textContent = seen ? "Seen ✓" : "Tap to reveal";
+
+    card.append(cardName, cardStatus);
+    if (seen) card.classList.add("is-seen");
+    card.addEventListener("click", () => revealPlayerCard(index));
+    playerCards.append(card);
+  });
+
+  dealProgress.textContent = `${seenPlayerIndices.size} of ${players.length} cards seen`;
+  startDiscussionButton.disabled = seenPlayerIndices.size !== players.length;
+  discussionButtonLabel.textContent = seenPlayerIndices.size === players.length
+    ? "Start discussion"
+    : "Everyone’s seen their card";
 }
 
-function passPhone() {
-  currentPlayerIndex += 1;
-  if (currentPlayerIndex < players.length) {
-    setupDealCard();
-    document.querySelector("#deal-title").focus();
-    return;
-  }
+function revealPlayerCard(index) {
+  if (seenPlayerIndices.has(index)) return;
 
+  activeCardIndex = index;
+  const isImpostor = impostorIndices.has(index);
+  dialogPlayerName.textContent = players[index];
+  document.querySelector(".player-card-dialog .eyebrow").lastChild.textContent = ` JUST FOR ${players[index].toUpperCase()}`;
+  dialogCardCategory.textContent = CATEGORY_LABELS[secretCategory];
+  dialogCardContent.textContent = isImpostor ? "You’re the impostor" : secretWord;
+  dialogCardContent.classList.toggle("is-impostor", isImpostor);
+  dialogCardHint.textContent = isImpostor ? "Blend in. Don’t get caught." : "Keep it secret. Blend in.";
+  playerCardDialog.showModal();
+  document.querySelector("#hide-player-card").focus();
+}
+
+function hidePlayerCard() {
+  if (activeCardIndex < 0) return;
+  const seenIndex = activeCardIndex;
+  seenPlayerIndices.add(seenIndex);
+  activeCardIndex = -1;
+  playerCardDialog.close();
+  renderPlayerCards();
+  playerCards.children[seenIndex]?.focus();
+}
+
+function startDiscussion() {
+  if (seenPlayerIndices.size !== players.length) return;
   showScreen("discussion");
   document.querySelector("#reveal-impostor").focus();
 }
+
+playerCardDialog.addEventListener("close", () => {
+  activeCardIndex = -1;
+  dialogCardContent.textContent = "";
+  dialogCardCategory.textContent = "";
+  dialogCardHint.textContent = "";
+  dialogCardContent.classList.remove("is-impostor");
+});
+
+document.querySelector("#hide-player-card").addEventListener("click", hidePlayerCard);
+startDiscussionButton.addEventListener("click", startDiscussion);
 
 function revealImpostor() {
   const impostorNames = players.filter((_, index) => impostorIndices.has(index));
@@ -242,7 +272,6 @@ document.querySelector("#back-to-setup").addEventListener("click", () => {
 });
 
 startButton.addEventListener("click", startRound);
-passPhoneButton.addEventListener("click", passPhone);
 document.querySelector("#reveal-impostor").addEventListener("click", revealImpostor);
 
 document.querySelector("#play-again").addEventListener("click", () => {

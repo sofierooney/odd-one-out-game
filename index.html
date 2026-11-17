@@ -86,22 +86,26 @@
           <button id="back-to-setup" class="text-button" type="button">← Edit players</button>
           <span id="round-label" class="round-label">ROUND 01</span>
         </div>
-        <div class="game-content">
+        <div class="deal-content">
           <p class="eyebrow"><span class="status-dot"></span> PASS THE PHONE</p>
-          <h1 id="deal-title" tabindex="-1">Your turn,<br><span id="current-player-name">Player 1</span></h1>
-          <p class="game-instruction">Make sure nobody else can see the screen. Tap below when you’re ready.</p>
-          <div class="card-wrap">
-            <button id="secret-card" class="secret-card" type="button" aria-label="Tap to reveal your card" aria-live="polite">
-              <span id="card-category" class="card-category"></span>
-              <span id="card-content" class="card-content">Tap to reveal</span>
-              <span id="card-hint" class="card-hint">Only you should look</span>
-            </button>
-          </div>
-          <button id="reveal-card" class="button button-primary action-button" type="button">Reveal my card <span aria-hidden="true">↗</span></button>
-          <button id="pass-phone" class="button button-secondary action-button" type="button" hidden>Hide card &amp; pass the phone <span aria-hidden="true">→</span></button>
-          <p id="deal-position" class="deal-position">PLAYER 1 OF 3</p>
+          <h1 id="deal-title">Choose your<br><span>name card.</span></h1>
+          <p class="game-instruction">Find your name, tap your card, and keep it private. After you’ve seen it, hide it so everyone knows you’re done.</p>
+          <p id="deal-progress" class="deal-progress" aria-live="polite">0 of 3 cards seen</p>
+          <div id="player-cards" class="player-cards" aria-label="Player cards"></div>
+          <button id="start-discussion" class="button button-primary action-button" type="button" disabled><span id="discussion-button-label">Everyone’s seen their card</span> <span aria-hidden="true">↗</span></button>
         </div>
       </section>
+
+      <dialog id="player-card-dialog" class="player-card-dialog" aria-labelledby="dialog-player-name">
+        <div class="dialog-content">
+          <p class="eyebrow"><span class="status-dot"></span> JUST FOR YOU</p>
+          <h2 id="dialog-player-name" class="dialog-player-name"></h2>
+          <p id="dialog-card-category" class="card-category"></p>
+          <p id="dialog-card-content" class="dialog-card-content"></p>
+          <p id="dialog-card-hint" class="card-hint"></p>
+          <button id="hide-player-card" class="button button-primary action-button" type="button">Hide card &amp; mark seen</button>
+        </div>
+      </dialog>
 
       <section id="discussion-screen" class="screen game-screen" aria-labelledby="discussion-title" hidden>
         <div class="game-progress">

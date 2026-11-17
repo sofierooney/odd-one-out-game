@@ -407,6 +407,171 @@ h1 span {
   padding: 28px 0 60px;
 }
 
+.deal-content {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 0 15px;
+  text-align: center;
+}
+
+.deal-content > .eyebrow {
+  margin-bottom: 20px;
+}
+
+.deal-content h1 {
+  margin-bottom: 14px;
+  font-family: var(--display);
+  font-size: clamp(42px, 8vw, 63px);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.98;
+}
+
+.deal-content h1 span {
+  color: var(--pink);
+}
+
+.deal-content .game-instruction {
+  margin-bottom: 20px;
+}
+
+.deal-progress {
+  margin: 0 0 16px;
+  color: var(--pink);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.player-cards {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.player-card {
+  display: flex;
+  min-height: 82px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(243, 166, 200, 0.09), transparent 70%),
+    var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.player-card:hover:not(:disabled) {
+  border-color: var(--pink);
+  background-color: var(--panel-raised);
+}
+
+.player-card:disabled {
+  cursor: default;
+}
+
+.player-card.is-seen {
+  border-color: transparent;
+  background: #17181d;
+  opacity: 0.48;
+}
+
+.player-card-name {
+  overflow: hidden;
+  width: 100%;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-card-status {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.player-card.is-seen .player-card-status {
+  color: var(--pink);
+}
+
+.player-card-dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 0;
+  overflow: visible;
+  border: 1px solid rgba(243, 166, 200, 0.4);
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(243, 166, 200, 0.13), transparent 65%),
+    var(--panel);
+  color: var(--ink);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
+}
+
+.player-card-dialog::backdrop {
+  background: rgba(8, 8, 12, 0.82);
+  backdrop-filter: blur(7px);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 26px 26px;
+  text-align: center;
+}
+
+.dialog-content > .eyebrow {
+  margin-bottom: 16px;
+}
+
+.dialog-player-name {
+  margin: 0 0 20px;
+  overflow-wrap: anywhere;
+  font-family: var(--display);
+  font-size: clamp(30px, 8vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+}
+
+.dialog-card-content {
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+  font-family: var(--display);
+  font-size: clamp(32px, 8vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.dialog-card-content.is-impostor {
+  color: var(--coral);
+}
+
+.dialog-content .card-hint {
+  margin: 0 0 24px;
+}
+
+.dialog-content .action-button {
+  width: 100%;
+}
+
 .game-progress {
   display: flex;
   align-items: center;
@@ -463,38 +628,6 @@ h1 span {
   font-size: 14px;
 }
 
-.card-wrap {
-  width: min(100%, 370px);
-  margin: 30px 0 20px;
-  perspective: 900px;
-}
-
-.secret-card {
-  display: flex;
-  width: 100%;
-  min-height: 204px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 26px;
-  appearance: none;
-  border: 1px solid rgba(243, 166, 200, 0.3);
-  border-radius: 8px;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(243, 166, 200, 0.11), transparent 65%),
-    #1d2026;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
-  color: var(--ink);
-  cursor: pointer;
-  text-align: center;
-  transition: transform 220ms ease, border-color 220ms ease;
-}
-
-.secret-card.is-revealed {
-  transform: rotateX(0deg);
-  border-color: var(--pink);
-}
-
 .card-category,
 .card-hint,
 .prompt-label,
@@ -515,19 +648,6 @@ h1 span {
   font-size: 9px;
 }
 
-.card-content {
-  margin: 15px 0;
-  font-family: var(--display);
-  font-size: clamp(29px, 8vw, 42px);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-}
-
-.secret-card.is-impostor .card-content {
-  color: var(--coral);
-  font-size: 31px;
-}
-
 .card-hint {
   color: var(--faint);
   letter-spacing: 0.04em;
@@ -536,14 +656,6 @@ h1 span {
 
 .action-button {
   width: min(100%, 370px);
-}
-
-.deal-position {
-  margin: 22px 0 0;
-  color: var(--faint);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.13em;
 }
 
 .discussion-icon {
@@ -693,6 +805,15 @@ h1 span {
   .game-screen {
     padding-top: 16px;
     padding-bottom: 32px;
+  }
+
+  .deal-content {
+    padding-top: 34px;
+  }
+
+  .player-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
   }
 
   .game-content {
