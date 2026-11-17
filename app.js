@@ -39,6 +39,7 @@ const dealProgress = document.querySelector("#deal-progress");
 const startDiscussionButton = document.querySelector("#start-discussion");
 const discussionButtonLabel = document.querySelector("#discussion-button-label");
 const playerCardDialog = document.querySelector("#player-card-dialog");
+const dialogAudience = document.querySelector("#dialog-audience");
 const dialogPlayerName = document.querySelector("#dialog-player-name");
 const dialogCardCategory = document.querySelector("#dialog-card-category");
 const dialogCardContent = document.querySelector("#dialog-card-content");
@@ -201,7 +202,7 @@ function renderPlayerCards() {
   startDiscussionButton.disabled = seenPlayerIndices.size !== players.length;
   discussionButtonLabel.textContent = seenPlayerIndices.size === players.length
     ? "Start discussion"
-    : "Everyone’s seen their card";
+    : "Waiting for everyone";
 }
 
 function revealPlayerCard(index) {
@@ -210,7 +211,7 @@ function revealPlayerCard(index) {
   activeCardIndex = index;
   const isImpostor = impostorIndices.has(index);
   dialogPlayerName.textContent = players[index];
-  document.querySelector(".player-card-dialog .eyebrow").lastChild.textContent = ` JUST FOR ${players[index].toUpperCase()}`;
+  dialogAudience.textContent = `JUST FOR ${players[index].toUpperCase()}`;
   dialogCardCategory.textContent = CATEGORY_LABELS[secretCategory];
   dialogCardContent.textContent = isImpostor ? "You’re the impostor" : secretWord;
   dialogCardContent.classList.toggle("is-impostor", isImpostor);

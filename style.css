@@ -422,6 +422,7 @@ h1 span {
 }
 
 .deal-content h1 {
+  width: 100%;
   margin-bottom: 14px;
   font-family: var(--display);
   font-size: clamp(42px, 8vw, 63px);
@@ -432,6 +433,7 @@ h1 span {
 
 .deal-content h1 span {
   color: var(--pink);
+  overflow-wrap: anywhere;
 }
 
 .deal-content .game-instruction {
