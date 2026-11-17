@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#14151b">
+    <title>Odd One Out — The Impostor Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Odd One Out home">
+          <span class="brand-mark" aria-hidden="true">✳</span>
+          <span>ODD ONE OUT</span>
+        </a>
+        <span class="topbar-note">A pass-the-phone party game</span>
+      </header>
+
+      <section id="setup-screen" class="screen setup-screen" aria-labelledby="setup-title">
+        <div class="intro">
+          <p class="eyebrow"><span class="status-dot"></span> A LITTLE MYSTERY FOR EVERYONE</p>
+          <h1 id="setup-title">Some of you<br><span>don’t know.</span></h1>
+          <p class="intro-copy">Everyone gets the secret word. The impostors don’t. Give clues, keep a straight face, and figure out who’s faking it.</p>
+        </div>
+
+        <div class="setup-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">01 / THE PLAYERS</p>
+              <h2>Who’s playing?</h2>
+            </div>
+            <span id="player-count" class="player-count">3 players</span>
+          </div>
+          <div id="player-list" class="player-list"></div>
+          <button id="add-player" class="add-player" type="button">
+            <span aria-hidden="true">+</span> Add a player
+          </button>
+
+          <div class="category-field">
+            <label for="category-select" class="eyebrow">02 / PICK A CATEGORY</label>
+            <div class="select-wrap">
+              <select id="category-select">
+                <option value="all">Surprise me</option>
+                <option value="food">Food &amp; drink</option>
+                <option value="animals">Animals</option>
+                <option value="locations">Locations</option>
+                <option value="things">Everyday things</option>
+                <option value="activities">Things to do</option>
+                <option value="people">People</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+
+          <div id="people-list-field" class="category-field people-list-field" hidden>
+            <label for="people-list-input" class="eyebrow">YOUR PEOPLE LIST</label>
+            <textarea id="people-list-input" class="people-list-input" rows="5" placeholder="Add one name per line as you remember them..." aria-describedby="people-list-note"></textarea>
+            <p id="people-list-note" class="field-note">Saved only in this browser. You can keep adding names later.</p>
+            <p id="people-list-error" class="error-message" role="alert" hidden></p>
+          </div>
+
+          <div class="category-field">
+            <label for="impostor-count" class="eyebrow">04 / HOW MANY IMPOSTORS?</label>
+            <div class="select-wrap">
+              <select id="impostor-count">
+                <option value="1">1 impostor</option>
+                <option value="2">2 impostors</option>
+                <option value="3">3 impostors</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+
+          <button id="start-game" class="button button-primary start-button" type="button">
+            Deal the cards <span aria-hidden="true">↗</span>
+          </button>
+          <p id="setup-error" class="error-message" role="alert" hidden></p>
+        </div>
+        <p class="how-to"><span>HOW TO PLAY</span> Pass the phone. Keep your card secret. Then take turns giving one-word clues.</p>
+      </section>
+
+      <section id="deal-screen" class="screen game-screen" aria-labelledby="deal-title" hidden>
+        <div class="game-progress">
+          <button id="back-to-setup" class="text-button" type="button">← Edit players</button>
+          <span id="round-label" class="round-label">ROUND 01</span>
+        </div>
+        <div class="game-content">
+          <p class="eyebrow"><span class="status-dot"></span> PASS THE PHONE</p>
+          <h1 id="deal-title" tabindex="-1">Your turn,<br><span id="current-player-name">Player 1</span></h1>
+          <p class="game-instruction">Make sure nobody else can see the screen. Tap below when you’re ready.</p>
+          <div class="card-wrap">
+            <button id="secret-card" class="secret-card" type="button" aria-label="Tap to reveal your card" aria-live="polite">
+              <span id="card-category" class="card-category"></span>
+              <span id="card-content" class="card-content">Tap to reveal</span>
+              <span id="card-hint" class="card-hint">Only you should look</span>
+            </button>
+          </div>
+          <button id="reveal-card" class="button button-primary action-button" type="button">Reveal my card <span aria-hidden="true">↗</span></button>
+          <button id="pass-phone" class="button button-secondary action-button" type="button" hidden>Hide card &amp; pass the phone <span aria-hidden="true">→</span></button>
+          <p id="deal-position" class="deal-position">PLAYER 1 OF 3</p>
+        </div>
+      </section>
+
+      <section id="discussion-screen" class="screen game-screen" aria-labelledby="discussion-title" hidden>
+        <div class="game-progress">
+          <span class="round-label">THE GROUP ROUND</span>
+        </div>
+        <div class="game-content discussion-content">
+          <div class="discussion-icon" aria-hidden="true">✳</div>
+          <p class="eyebrow"><span class="status-dot"></span> EVERYONE KNOWS THEIR ROLE</p>
+          <h1 id="discussion-title">Time to<br><span>read the room.</span></h1>
+          <p class="discussion-reminder">Phones down. Give your clues from memory.</p>
+          <p class="game-instruction">Go around the circle. Each player gives one clue. No saying the word, and no making it too obvious.</p>
+          <p class="vote-note">When everyone’s ready, vote for the player you think is the impostor.</p>
+          <button id="reveal-impostor" class="button button-primary action-button" type="button">Reveal the impostor <span aria-hidden="true">↗</span></button>
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen game-screen" aria-labelledby="result-title" hidden>
+        <div class="game-progress">
+          <span class="round-label">THE REVEAL</span>
+        </div>
+        <div class="game-content result-content">
+          <div class="result-stamp" aria-hidden="true">!</div>
+          <p class="eyebrow"><span class="status-dot"></span> <span id="result-label">THE IMPOSTORS WERE</span></p>
+          <h1 id="result-title"><span id="impostor-names">Player</span></h1>
+          <div class="prompt-card result-word-card">
+            <span class="prompt-label">THE SECRET WORD WAS</span>
+            <span id="result-word" class="discussion-word"></span>
+            <span id="result-category" class="result-category"></span>
+          </div>
+          <p class="game-instruction">Did they fool everyone? The group decides who won.</p>
+          <button id="play-again" class="button button-primary action-button" type="button">Play another round <span aria-hidden="true">↻</span></button>
+          <button id="new-game" class="text-button new-game-button" type="button">Change players</button>
+        </div>
+      </section>
+
+      <footer class="footer"><span>GOOD LUCK OUT THERE.</span><span>MADE FOR GAME NIGHT</span></footer>
+    </main>
+  </body>
+</html>
